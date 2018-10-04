@@ -8,7 +8,7 @@ import csv
 import sys
 
 # Importing planning_utils
-from my_planning_utils_graph import a_star, heuristic, create_grid, create_grid_and_edges, show_start_goal, closest_point, collinearity_int
+from my_planning_utils_graph import a_star, heuristic, create_grid_and_edges, show_start_goal, closest_point, collinearity_int
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
