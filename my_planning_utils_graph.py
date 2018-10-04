@@ -20,8 +20,6 @@ nx.__version__
 from skimage.morphology import medial_axis
 from skimage.util import invert
 
-get_ipython().run_line_magic('matplotlib', 'inline')
-
 
 # from Voronoi Solution
 def create_grid_and_edges(data, drone_altitude, safety_distance):
