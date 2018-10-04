@@ -10,9 +10,7 @@ import matplotlib.pyplot as plt
 
 # For graph representation
 import sys
-get_ipython().system('{sys.executable} -m pip install -I networkx==2.1')
 import pkg_resources
-pkg_resources.require("networkx==2.1")
 import networkx as nx
 
 # Should be 2.1
