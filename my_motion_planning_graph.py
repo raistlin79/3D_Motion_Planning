@@ -193,7 +193,7 @@ class MotionPlanning(Drone):
 
         # TODO: prune path to minimize number of waypoints
         # TODO (if you're feeling ambitious): Try a different approach altogether!
-        for p+2 in path:
+        for p in range(len(path)-2):
             if collinearity(path[p],path[p+1],path[p+2]):
                 path.remove(p+1)
 
