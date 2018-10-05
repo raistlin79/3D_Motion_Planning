@@ -181,10 +181,31 @@ def closest_point(graph, current_point):
     return closest_point
 
 
-# ---------------------------------------------------------------------------------------------------------------------------
-# ---------------------------------------------------------------------------------------------------------------------------
+#------------------------------------
+#------------------------------------
+
+# Prune path collinearty check.
+
+def prune_path(path):
+    for p in range(len(path)-3):
+        if collinearity_float(path[p],path[p+1],path[p+2]):
+            path.remove(path[p+1])
+    return path
 
 # Implementation from course
+
+# Define a function to take three points and test for collinearity by evaluating the determinant using the simplified version for the 2D case:
+#
+# $ det according Sarrus rule$
+
+def collinearity(p1, p2, p3):
+    collinear = False
+    # Calculate the determinant of the matrix using integer arithmetic
+    det = p1[0]*(p2[1] - p3[1]) + p2[0]*(p3[1] - p1[1]) + p3[0]*(p1[1] - p2[1])
+    # Set collinear to True if the determinant is equal to zero
+    if det == 0:
+        collinear = True
+    return collinear
 
 # ### 3D case
 #
@@ -204,23 +225,4 @@ def collinearity_float(p1, p2, p3, epsilon=1e-6):
         collinear = True
 
     return collinear
-
-
-# ### 2D Case
-# Define a function to take three points and test for collinearity by evaluating the determinant using the simplified version for the 2D case:
-#
-# $ det according Sarrus rule$
-
-
-def collinearity(p1, p2, p3):
-    collinear = False
-    # Calculate the determinant of the matrix using integer arithmetic
-    det = p1[0]*(p2[1] - p3[1]) + p2[0]*(p3[1] - p1[1]) + p3[0]*(p1[1] - p2[1])
-    # Set collinear to True if the determinant is equal to zero
-    if det == 0:
-        collinear = True
-
-    return collinear
-
-
 #

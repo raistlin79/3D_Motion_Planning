@@ -2,13 +2,18 @@ import argparse
 import time
 import msgpack
 from enum import Enum, auto
+import matplotlib.pyplot as plt
 
 import numpy as np
+import numpy.linalg as LA
 import csv
 import sys
 
+# Import for graph planning
+import networkx as nx
+
 # Importing planning_utils
-from my_planning_utils_graph import a_star, heuristic, create_grid_and_edges, show_start_goal, closest_point, collinearity
+from my_planning_utils_graph import a_star, heuristic, create_grid_and_edges, show_start_goal, closest_point, prune_path
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
@@ -129,15 +134,18 @@ class MotionPlanning(Drone):
         lat, lon =  open('colliders.csv').readline().split(",")
         lat0 = float(lat.strip("lat0 "))
         lon0 = float(lon.strip("lon0 "))
+        print('lon = ', lon0 , ' , lat0 = ', lat0)
 
         # TODO: set home position to (lon0, lat0, 0)
         self.set_home_position(lon0, lat0, 0)
 
+
         # TODO: retrieve current global position
-        self.global_position = (self._latitude, self._longitude, self._altitude)
+        current_global_position = (self._longitude, self._latitude, self._altitude)
+        print('Global position: ', current_global_position)
 
         # TODO: convert to current local position using global_to_local()
-        self.local_position = self.global_to_local(self.global_position, self.global_home)
+        self.LOCAL_POSITION = global_to_local(current_global_position, self.global_home)
 
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position, self.local_position))
         # Read in obstacle map
@@ -146,7 +154,9 @@ class MotionPlanning(Drone):
         # TODO: adapt create_grid_and_edges to return north_offset and east_offset
         # Define a grid for a particular altitude and safety margin around obstacles
         grid, north_offset, east_offset, edges = create_grid_and_edges(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
-        print(len(edges))
+        print("Len of edges: ", len(edges))
+        print("North_offset: ", north_offset)
+        print("East_offset: ", east_offset)
 
         # create graph from edges
         G = nx.Graph()
@@ -158,7 +168,7 @@ class MotionPlanning(Drone):
 
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
         # Define starting point on the grid (this is just grid center)
-        grid_start = (self.local_position[0] - north_offset, self.local_position[1] - east_offset)
+        grid_start = (-north_offset + self.local_position[0] , -east_offset + self.local_position[1])
         # TODO: convert start position to current position rather than map center
 
 
@@ -166,39 +176,39 @@ class MotionPlanning(Drone):
         # grid_goal = (-north_offset + 10, -east_offset + 10) (Initial)
         # TODO: adapt to set goal as latitude / longitude position and convert
         try:
-            goal_lon, goal_lat = float(input("Please provide Lon/Lat coordinates separated by ','.").split(","))
+            goal_lon = float(input("Please provide Lon value:"))
+            goal_lat = float(input("Please provide Lat value:"))
         except ValueError:
             print("Please insert Lon/Lat as a float")
             sys.exit()
 
         global_goal = (goal_lon, goal_lat, 0)
         local_goal = global_to_local(global_goal, self.global_home)
-        grid_goal = (local_goal[0] -north_offset, local_goal[1] -east_offset)
+        # add north_offset, east_offset
+        grid_goal = (-north_offset + local_goal[0] , -east_offset + local_goal[1] )
         print('Grid Goal: ', grid_goal)
 
         # conversion for graph
         start_ne_g = closest_point(G, grid_start)
         goal_ne_g = closest_point(G, grid_goal)
-        print(start_ne_g)
-        print(goal_ne_g)
+        print("start_ne_g: ", start_ne_g)
+        print("goal_ne_g: ", goal_ne_g)
 
 
         # Run A* to find a path from start to goal
         # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
         # or move to a different search space such as a graph (not done here)
         # Graph solution choosen
-        print('Local Start and Goal: ', start_ne_g, goal_ne_g)
         path, cost = a_star(G, heuristic, start_ne_g, goal_ne_g)
-        print(len(path))
+        print("path len: ", len(path))
 
         # TODO: prune path to minimize number of waypoints
         # TODO (if you're feeling ambitious): Try a different approach altogether!
-        for p in range(len(path)-2):
-            if collinearity(path[p],path[p+1],path[p+2]):
-                path.remove(p+1)
+        pruned_path = prune_path(path)
+        print("pruned path len: ", len(pruned_path))
 
         # Convert path to waypoints
-        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
+        waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in pruned_path]
         # Set self.waypoints
         self.waypoints = waypoints
         # TODO: send waypoints to sim (this is just for visualization of waypoints)
@@ -212,15 +222,15 @@ class MotionPlanning(Drone):
             p2 = e[1]
             plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'b-')
 
-        plt.plot([start_ne[1], start_ne_g[1]], [start_ne[0], start_ne_g[0]], 'r-')
-        for i in range(len(path)-1):
-            p1 = path[i]
-            p2 = path[i+1]
+        plt.plot([grid_start[1], start_ne_g[1]], [grid_start[0], start_ne_g[0]], 'r-')
+        for i in range(len(pruned_path)-1):
+            p1 = pruned_path[i]
+            p2 = pruned_path[i+1]
             plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'r-')
-        plt.plot([goal_ne[1], goal_ne_g[1]], [goal_ne[0], goal_ne_g[0]], 'r-')
+        plt.plot([grid_goal[1], goal_ne_g[1]], [grid_goal[0], goal_ne_g[0]], 'r-')
 
-        plt.plot(start_ne[1], start_ne[0], 'gx')
-        plt.plot(goal_ne[1], goal_ne[0], 'gx')
+        plt.plot(grid_start[1], grid_start[0], 'gx')
+        plt.plot(grid_goal[1], grid_goal[0], 'gx')
 
         plt.xlabel('EAST', fontsize=20)
         plt.ylabel('NORTH', fontsize=20)
