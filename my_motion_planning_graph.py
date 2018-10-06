@@ -215,7 +215,7 @@ class MotionPlanning(Drone):
         self.send_waypoints()
 
         # visulation from Graph search
-        plt.imshow(grid, origin='lower', cmap='Greys')
+'''        plt.imshow(grid, origin='lower', cmap='Greys')
 
         for e in edges:
             p1 = e[0]
@@ -235,6 +235,7 @@ class MotionPlanning(Drone):
         plt.xlabel('EAST', fontsize=20)
         plt.ylabel('NORTH', fontsize=20)
         plt.show()
+'''
 
     def start(self):
         self.start_log("Logs", "NavLog.txt")
