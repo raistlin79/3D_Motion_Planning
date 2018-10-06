@@ -215,7 +215,6 @@ class MotionPlanning(Drone):
         self.send_waypoints()
 
         # visulation from Graph search
-<<<<<<< HEAD
         #plt.imshow(grid, origin='lower', cmap='Greys')
 
         #for e in edges:
@@ -236,50 +235,6 @@ class MotionPlanning(Drone):
 #        plt.xlabel('EAST', fontsize=20)
 #        plt.ylabel('NORTH', fontsize=20)
 #        plt.show()
-||||||| merged common ancestors
-        plt.imshow(grid, origin='lower', cmap='Greys')
-
-        for e in edges:
-            p1 = e[0]
-            p2 = e[1]
-            plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'b-')
-
-        plt.plot([grid_start[1], start_ne_g[1]], [grid_start[0], start_ne_g[0]], 'r-')
-        for i in range(len(pruned_path)-1):
-            p1 = pruned_path[i]
-            p2 = pruned_path[i+1]
-            plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'r-')
-        plt.plot([grid_goal[1], goal_ne_g[1]], [grid_goal[0], goal_ne_g[0]], 'r-')
-
-        plt.plot(grid_start[1], grid_start[0], 'gx')
-        plt.plot(grid_goal[1], grid_goal[0], 'gx')
-
-        plt.xlabel('EAST', fontsize=20)
-        plt.ylabel('NORTH', fontsize=20)
-        plt.show()
-=======
-'''        plt.imshow(grid, origin='lower', cmap='Greys')
-
-        for e in edges:
-            p1 = e[0]
-            p2 = e[1]
-            plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'b-')
-
-        plt.plot([grid_start[1], start_ne_g[1]], [grid_start[0], start_ne_g[0]], 'r-')
-        for i in range(len(pruned_path)-1):
-            p1 = pruned_path[i]
-            p2 = pruned_path[i+1]
-            plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'r-')
-        plt.plot([grid_goal[1], goal_ne_g[1]], [grid_goal[0], goal_ne_g[0]], 'r-')
-
-        plt.plot(grid_start[1], grid_start[0], 'gx')
-        plt.plot(grid_goal[1], grid_goal[0], 'gx')
-
-        plt.xlabel('EAST', fontsize=20)
-        plt.ylabel('NORTH', fontsize=20)
-        plt.show()
-'''
->>>>>>> 1f97f1369789fd2986e5ec5b72e8ba4d4430206d
 
     def start(self):
         self.start_log("Logs", "NavLog.txt")
