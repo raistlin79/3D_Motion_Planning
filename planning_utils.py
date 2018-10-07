@@ -80,10 +80,6 @@ def valid_actions(grid, current_node):
     x, y = current_node
     print ("Grid Shape: ", n, " , ", m)
     print ("Current Node: ", x, " , ", y)
-    print ("Grid Test1: ", grid[x - 1, y])
-    print ("Grid Test2: ", grid[x + 1, y])
-    print ("Grid Test3: ", grid[x, y - 1])
-    print ("Grid Test4: ", grid[x, y + 1])
 
     # check if the node is off the grid or
     # it's an obstacle
