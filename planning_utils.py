@@ -1,6 +1,7 @@
 from enum import Enum
 from queue import PriorityQueue
 import numpy as np
+import math
 
 
 def create_grid(data, drone_altitude, safety_distance):
@@ -51,13 +52,13 @@ class Action(Enum):
     is the cost of performing the action.
     """
     NORTH = (-1, 0, 1)
-    NORTHWEST = (-1,-1, sqrt(2))
+    NORTHWEST = (-1, -1, math.sqrt(2))
     WEST = (0, -1, 1)
-    SOUTHWEST = (1,-1, sqrt(2))
+    SOUTHWEST = (1, -1, math.sqrt(2))
     SOUTH = (1, 0, 1)
-    SOUTHEAST = (1, 1, sqrt(2))
+    SOUTHEAST = (1, 1, math.sqrt(2))
     EAST = (0, 1, 1)
-    NORTHEAST = (-1,1,sqrt(2))
+    NORTHEAST = (-1, 1, math.sqrt(2))
 
 
 
