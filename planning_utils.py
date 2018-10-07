@@ -50,11 +50,16 @@ class Action(Enum):
     to the current grid position. The third and final value
     is the cost of performing the action.
     """
-
-    WEST = (0, -1, 1)
-    EAST = (0, 1, 1)
     NORTH = (-1, 0, 1)
+    NORTHWEST = (-1,-1, sqrt(2))
+    WEST = (0, -1, 1)
+    SOUTHWEST = (1,-1, sqrt(2))
     SOUTH = (1, 0, 1)
+    SOUTHEAST = (1, 1, sqrt(2))
+    EAST = (0, 1, 1)
+    NORTHEAST = (-1,1,sqrt(2))
+
+
 
     @property
     def cost(self):
@@ -78,12 +83,20 @@ def valid_actions(grid, current_node):
 
     if x - 1 < 0 or grid[x - 1, y] == 1:
         valid_actions.remove(Action.NORTH)
+        valid_actions.remove(Action.NORTHWEST)
+        valid_actions.remove(Action.NORTHEAST)
     if x + 1 > n or grid[x + 1, y] == 1:
         valid_actions.remove(Action.SOUTH)
+        valid_actions.remove(Action.SOUTHWEST)
+        valid_actions.remove(Action.SOUTHEAST)
     if y - 1 < 0 or grid[x, y - 1] == 1:
         valid_actions.remove(Action.WEST)
+        valid_actions.remove(Action.NORTHWEST)
+        valid_actions.remove(Action.SOUTHWEST)
     if y + 1 > m or grid[x, y + 1] == 1:
         valid_actions.remove(Action.EAST)
+        valid_actions.remove(Action.NORTHEAST)
+        valid_actions.remove(Action.SOUTHEAST)
 
     return valid_actions
 
@@ -98,16 +111,16 @@ def a_star(grid, h, start, goal):
 
     branch = {}
     found = False
-    
+
     while not queue.empty():
         item = queue.get()
         current_node = item[1]
         if current_node == start:
             current_cost = 0.0
-        else:              
+        else:
             current_cost = branch[current_node][0]
-            
-        if current_node == goal:        
+
+        if current_node == goal:
             print('Found a path.')
             found = True
             break
@@ -118,12 +131,12 @@ def a_star(grid, h, start, goal):
                 next_node = (current_node[0] + da[0], current_node[1] + da[1])
                 branch_cost = current_cost + action.cost
                 queue_cost = branch_cost + h(next_node, goal)
-                
-                if next_node not in visited:                
-                    visited.add(next_node)               
+
+                if next_node not in visited:
+                    visited.add(next_node)
                     branch[next_node] = (branch_cost, current_node, action)
                     queue.put((queue_cost, next_node))
-             
+
     if found:
         # retrace steps
         n = goal
@@ -136,7 +149,7 @@ def a_star(grid, h, start, goal):
     else:
         print('**********************')
         print('Failed to find a path!')
-        print('**********************') 
+        print('**********************')
     return path[::-1], path_cost
 
 
@@ -144,3 +157,23 @@ def a_star(grid, h, start, goal):
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
+def prune_path(path):
+    for p in range(len(path)-3):
+        if collinearity(path[p],path[p+1],path[p+2]):
+            path.remove(path[p+1])
+    return path
+
+# Implementation from course
+
+# Define a function to take three points and test for collinearity by evaluating the determinant using the simplified version for the 2D case:
+#
+# $ det according Sarrus rule$
+
+def collinearity(p1, p2, p3):
+    collinear = False
+    # Calculate the determinant of the matrix using integer arithmetic
+    det = p1[0]*(p2[1] - p3[1]) + p2[0]*(p3[1] - p1[1]) + p3[0]*(p1[1] - p2[1])
+    # Set collinear to True if the determinant is equal to zero
+    if det == 0:
+        collinear = True
+    return collinear
