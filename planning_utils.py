@@ -159,7 +159,7 @@ def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
 def prune_path(path):
-    for p in range(len(path)-3):
+    for p in range(path):
         print("Path p: ", path[p])
         print("Path p+1: ", path[p+1])
         print("Path p+2: ", path[p+2])
