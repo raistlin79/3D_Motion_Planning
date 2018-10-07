@@ -4,20 +4,14 @@ import msgpack
 from enum import Enum, auto
 
 import numpy as np
-import csv
-import sys
 
-# Importing planning_utils
-from my_planning_utils import a_star, heuristic, create_grid
+from planning_utils import a_star, heuristic, create_grid
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
-
-#Two different reference frames are defined and used within the Drone API. Global positions are defined as [longitude, latitude, altitude (positive up)]. Local reference frames #are defined [North, East, Down (positive down)] and is relative to a nearby global home provided. Both reference frames are defined in a proper right-handed reference frame. The #global reference frame is what is provided by the Drone's GPS. Two convenience functions, global_to_local() and local_to_global() are provided within the frame_utils.py script #to convert between the two frames. These functions are wrappers on utm library functions.
-
 from udacidrone.frame_utils import global_to_local
 
-# Numbering performed automatically (concrete value not important)
+
 class States(Enum):
     MANUAL = auto()
     ARMING = auto()
@@ -126,45 +120,28 @@ class MotionPlanning(Drone):
         self.target_position[2] = TARGET_ALTITUDE
 
         # TODO: read lat0, lon0 from colliders into floating point values
-        lat, lon =  open('colliders.csv').readline().split(",")
-        lat0 = float(lat.strip("lat0 "))
-        lon0 = float(lon.strip("lon0 "))
-
+        
         # TODO: set home position to (lon0, lat0, 0)
-        self.set_home_position(lon0, lat0, 0)
 
         # TODO: retrieve current global position
-        self.global_position = (self._latitude, self._longitude, self._altitude)
-
+ 
         # TODO: convert to current local position using global_to_local()
-        self.local_position = self.global_to_local(self.global_position, self.global_home)
-
-        print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position, self.local_position))
+        
+        print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
+                                                                         self.local_position))
         # Read in obstacle map
         data = np.loadtxt('colliders.csv', delimiter=',', dtype='Float64', skiprows=2)
-
+        
         # Define a grid for a particular altitude and safety margin around obstacles
         grid, north_offset, east_offset = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
         # Define starting point on the grid (this is just grid center)
-        grid_start = (self.local_position[0] - north_offset, self.local_position[1] - east_offset)
+        grid_start = (-north_offset, -east_offset)
         # TODO: convert start position to current position rather than map center
-
-
+        
         # Set goal as some arbitrary position on the grid
-        # grid_goal = (-north_offset + 10, -east_offset + 10) (Initial)
+        grid_goal = (-north_offset + 10, -east_offset + 10)
         # TODO: adapt to set goal as latitude / longitude position and convert
-        try:
-            goal_lon, goal_lat = float(input("Please provide Lon/Lat coordinates separated by ','.").split(","))
-        except ValueError:
-            print("Please insert Lon/Lat as a float")
-            sys.exit()
-
-        global_goal = (goal_lon, goal_lat, 0)
-        local_goal = global_to_local(global_goal, self.global_home)
-        grid_goal = (local_goal[0] -north_offset, local_goal[1] -east_offset)
-        print('Grid Goal: ', grid_goal)
-
 
         # Run A* to find a path from start to goal
         # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
