@@ -78,8 +78,6 @@ def valid_actions(grid, current_node):
     valid_actions = list(Action)
     n, m = grid.shape[0] - 1, grid.shape[1] - 1
     x, y = current_node
-    print ("Grid Shape: ", n, " , ", m)
-    print ("Current Node: ", x, " , ", y)
 
     # check if the node is off the grid or
     # it's an obstacle
@@ -162,7 +160,7 @@ def heuristic(position, goal_position):
 
 def prune_path(path):
     for p in range(len(path)-3):
-        if collinearity(int(path[p]), int(path[p+1]), int(path[p+2])):
+        if collinearity(path[p], path[p+1], path[p+2]):
             path.remove(path[p+1])
     return path
 
