@@ -187,10 +187,18 @@ def closest_point(graph, current_point):
 # Prune path collinearty check.
 
 def prune_path(path):
-    for p in range(len(path)-3):
-        if collinearity(int(path[p]), int(path[p+1]), int(path[p+2])):
-            path.remove(path[p+1])
-    return path
+    if len(path) < 2:
+        return path
+    else:
+        p = 2
+        while p < len(path) - 2:
+            if collinearity(path[p], path[p+1], path[p+2]):
+                path.remove(path[p+1])
+                print("Removed: ", path[p+1])
+            else:
+                p += 1
+                print("Go on with: ", p)
+        return path
 
 # Implementation from course
 

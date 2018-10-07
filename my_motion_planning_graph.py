@@ -168,8 +168,9 @@ class MotionPlanning(Drone):
 
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
         # Define starting point on the grid (this is just grid center)
-        grid_start = (-north_offset + int(self.local_position[0]) , -east_offset + int(self.local_position[1]))
         # TODO: convert start position to current position rather than map center
+        grid_start = (-north_offset + int(self.local_position[0]) , -east_offset + int(self.local_position[1]))
+
 
 
         # Set goal as some arbitrary position on the grid
@@ -185,7 +186,7 @@ class MotionPlanning(Drone):
         global_goal = (goal_lon, goal_lat, 0)
         local_goal = global_to_local(global_goal, self.global_home)
         # add north_offset, east_offset
-        grid_goal = (-north_offset + int(local_goal[0]), -east_offset + int(local_goal[1]))
+        grid_goal = (-north_offset + int(local_goal[0]) , -east_offset + int(local_goal[1]))
         print('Grid Goal: ', grid_goal)
 
         # conversion for graph
