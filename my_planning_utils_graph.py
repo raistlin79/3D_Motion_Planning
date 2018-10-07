@@ -21,7 +21,7 @@ from skimage.morphology import medial_axis
 from skimage.util import invert
 
 
-# from Voronoi Solution
+# from Voronoi Solution of class
 def create_grid_and_edges(data, drone_altitude, safety_distance):
     """
     Returns a grid representation of a 2D configuration space
@@ -108,8 +108,7 @@ def show_start_goal(grid, edges):
         plt.show()
 
 
-
-
+# From Graph solution of class
 def a_star(graph, h, start, goal):
     """Modified A* to work with NetworkX graphs."""
 
@@ -161,11 +160,12 @@ def a_star(graph, h, start, goal):
     return path[::-1], path_cost
 
 
-
+# Standard heuristic Norm. See class
 def heuristic(n1, n2):
     return LA.norm(np.array(n2) - np.array(n1))
 
 
+# From Graph solution of class
 def closest_point(graph, current_point):
     """
     Compute the closest point in the `graph`
@@ -184,26 +184,22 @@ def closest_point(graph, current_point):
 #------------------------------------
 #------------------------------------
 
-# Prune path collinearty check.
-
+# Method to reduce/prune path using collinearty function below.
 def prune_path(path):
+    # 3 points needed, otherwise path can not be reduced.
     if len(path) < 2:
         return path
     else:
         p = 2
+        # since it can not be said how many reductions will be performed before hand, while is more convenient.
         while p < len(path) - 2:
             if collinearity(path[p], path[p+1], path[p+2]):
                 path.remove(path[p+1])
-                print("Removed: ", path[p+1])
             else:
                 p += 1
-                print("Go on with: ", p)
         return path
 
 # Implementation from course
-
-# Define a function to take three points and test for collinearity by evaluating the determinant using the simplified version for the 2D case:
-#
 # $ det according Sarrus rule$
 
 def collinearity(p1, p2, p3):
@@ -214,23 +210,3 @@ def collinearity(p1, p2, p3):
     if det == 0:
         collinear = True
     return collinear
-
-# ### 3D case
-#
-# Define a function to determine collinearity for the 3D case using the `np.linalg.det()` function. Introduce the `epsilon` threshold to deal with numerical precision issues and/or allow a tolerance for collinearity. If the determinant is less than `epsilon` then the points are collinear.
-
-# Define a simple function to add a z coordinate of 1
-
-def collinearity_float(p1, p2, p3, epsilon=1e-6):
-    collinear = False
-    # Create the matrix out of three points
-    # Add points as rows in a matrix
-    mat = np.vstack((point(p1), point(p2), point(p3)))
-    # Calculate the determinant of the matrix.
-    det = np.linalg.det(mat)
-    # Set collinear to True if the determinant is less than epsilon
-    if det < epsilon:
-        collinear = True
-
-    return collinear
-#

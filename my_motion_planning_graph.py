@@ -19,7 +19,6 @@ from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
 
 #Two different reference frames are defined and used within the Drone API. Global positions are defined as [longitude, latitude, altitude (positive up)]. Local reference frames #are defined [North, East, Down (positive down)] and is relative to a nearby global home provided. Both reference frames are defined in a proper right-handed reference frame. The #global reference frame is what is provided by the Drone's GPS. Two convenience functions, global_to_local() and local_to_global() are provided within the frame_utils.py script #to convert between the two frames. These functions are wrappers on utm library functions.
-
 from udacidrone.frame_utils import global_to_local
 
 # Numbering performed automatically (concrete value not important)
@@ -31,7 +30,6 @@ class States(Enum):
     LANDING = auto()
     DISARMING = auto()
     PLANNING = auto()
-
 
 class MotionPlanning(Drone):
 
@@ -130,11 +128,10 @@ class MotionPlanning(Drone):
 
         self.target_position[2] = TARGET_ALTITUDE
 
-        # TODO: read lat0, lon0 from colliders into floating point values
+        # TODO: read lat0, lon0 from colliders into floating point values and format it accordingly to fit lat0, lon0
         lat, lon =  open('colliders.csv').readline().split(",")
         lat0 = float(lat.strip("lat0 "))
         lon0 = float(lon.strip("lon0 "))
-        print('lon = ', lon0 , ' , lat0 = ', lat0)
 
         # TODO: set home position to (lon0, lat0, 0)
         self.set_home_position(lon0, lat0, 0)
@@ -151,14 +148,14 @@ class MotionPlanning(Drone):
         # Read in obstacle map
         data = np.loadtxt('colliders.csv', delimiter=',', dtype='Float64', skiprows=2)
 
-        # TODO: adapt create_grid_and_edges to return north_offset and east_offset
+        # TODO: create_grid_and_edges is used for graph solution. Adapt create_grid_and_edges to return north_offset and east_offset
         # Define a grid for a particular altitude and safety margin around obstacles
         grid, north_offset, east_offset, edges = create_grid_and_edges(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
         print("Len of edges: ", len(edges))
         print("North_offset: ", north_offset)
         print("East_offset: ", east_offset)
 
-        # create graph from edges
+        # TODO: create graph from edges
         G = nx.Graph()
         for e in edges:
             p1 = e[0]
@@ -167,15 +164,16 @@ class MotionPlanning(Drone):
             G.add_edge(p1, p2, weight=dist)
 
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
-        # Define starting point on the grid (this is just grid center)
-        # TODO: convert start position to current position rather than map center
+
+        # TODO: Convert start position to current position rather than map center
+        # Format has to be regarded.
         grid_start = (-north_offset + int(self.local_position[0]) , -east_offset + int(self.local_position[1]))
 
-
-
-        # Set goal as some arbitrary position on the grid
-        # grid_goal = (-north_offset + 10, -east_offset + 10) (Initial)
-        # TODO: adapt to set goal as latitude / longitude position and convert
+        # TODO: Set goal as some arbitrary position on the grid
+        # Ask for input (global format)
+        # Test values:
+        # lon = -122.39725
+        # las = 37.79392
         try:
             goal_lon = float(input("Please provide Lon value:"))
             goal_lat = float(input("Please provide Lat value:"))
@@ -183,32 +181,30 @@ class MotionPlanning(Drone):
             print("Please insert Lon/Lat as a float")
             sys.exit()
 
+        # TODO: adapt to set goal as latitude / longitude position and convert
         global_goal = (goal_lon, goal_lat, 0)
         local_goal = global_to_local(global_goal, self.global_home)
-        # add north_offset, east_offset
+
+        # TODO: add north_offset, east_offset
         grid_goal = (-north_offset + int(local_goal[0]) , -east_offset + int(local_goal[1]))
         print('Grid Goal: ', grid_goal)
 
-        # conversion for graph
+        # TODO: conversion for graph
         start_ne_g = closest_point(G, grid_start)
         goal_ne_g = closest_point(G, grid_goal)
         print("start_ne_g: ", start_ne_g)
         print("goal_ne_g: ", goal_ne_g)
 
 
-        # Run A* to find a path from start to goal
-        # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
-        # or move to a different search space such as a graph (not done here)
-        # Graph solution choosen
+        # TODO: Graph solution choosen
         path, cost = a_star(G, heuristic, start_ne_g, goal_ne_g)
         print("path len: ", len(path))
 
         # TODO: prune path to minimize number of waypoints
-        # TODO (if you're feeling ambitious): Try a different approach altogether!
         pruned_path = prune_path(path)
         print("pruned path len: ", len(pruned_path))
 
-        # Convert path to waypoints
+        # TODO: Convert path to waypoints
         waypoints = [[int(p[0]) + north_offset, int(p[1]) + east_offset, TARGET_ALTITUDE, 0] for p in pruned_path]
 
         # Set self.waypoints
@@ -216,27 +212,6 @@ class MotionPlanning(Drone):
         # TODO: send waypoints to sim (this is just for visualization of waypoints)
         self.send_waypoints()
 
-        # visulation from Graph search
-        #plt.imshow(grid, origin='lower', cmap='Greys')
-
-        #for e in edges:
-        #    p1 = e[0]
-        #    p2 = e[1]
-        #    plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'b-')
-#
-#        plt.plot([grid_start[1], start_ne_g[1]], [grid_start[0], start_ne_g[0]], 'r-')
-#        for i in range(len(pruned_path)-1):
-#            p1 = pruned_path[i]
-#            p2 = pruned_path[i+1]
-#            plt.plot([p1[1], p2[1]], [p1[0], p2[0]], 'r-')
-#        plt.plot([grid_goal[1], goal_ne_g[1]], [grid_goal[0], goal_ne_g[0]], 'r-')
-#
-#        plt.plot(grid_start[1], grid_start[0], 'gx')
-#        plt.plot(grid_goal[1], grid_goal[0], 'gx')
-#
-#        plt.xlabel('EAST', fontsize=20)
-#        plt.ylabel('NORTH', fontsize=20)
-#        plt.show()
 
     def start(self):
         self.start_log("Logs", "NavLog.txt")

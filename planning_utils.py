@@ -51,6 +51,7 @@ class Action(Enum):
     to the current grid position. The third and final value
     is the cost of performing the action.
     """
+    # TODO: Add diagonals: NORTHWEST, SOUTHWEST, SOUTHEAST, NORTHEAST and add cost sqrt(2)
     NORTH = (-1, 0, 1)
     NORTHWEST = (-1, -1, math.sqrt(2))
     WEST = (0, -1, 1)
@@ -81,6 +82,8 @@ def valid_actions(grid, current_node):
 
     # check if the node is off the grid or
     # it's an obstacle
+
+    # TODO: Adapt valid_actions accordingly. Check diagonals first to avoid out of bounds exception.
 
     if (x - 1 < 0 and y - 1 < 0) or grid[x - 1, y - 1] == 1:
         valid_actions.remove(Action.NORTHWEST)
@@ -158,11 +161,15 @@ def a_star(grid, h, start, goal):
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
+
+# Method to reduce/prune path using collinearty function below.
 def prune_path(path):
+    # 3 points needed, otherwise path can not be reduced.
     if len(path) < 2:
         return path
     else:
         p = 2
+        # since it can not be said how many reductions will be performed before hand, while is more convenient.
         while p < len(path) - 2:
             if collinearity(path[p], path[p+1], path[p+2]):
                 path.remove(path[p+1])
@@ -170,10 +177,8 @@ def prune_path(path):
                 p += 1
         return path
 
-# Implementation from course
 
-# Define a function to take three points and test for collinearity by evaluating the determinant using the simplified version for the 2D case:
-#
+# Implementation from course
 # $ det according Sarrus rule$
 
 def collinearity(p1, p2, p3):
