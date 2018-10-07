@@ -190,8 +190,8 @@ class MotionPlanning(Drone):
         print('Grid Goal: ', grid_goal)
 
         # conversion for graph
-        start_ne_g = int(closest_point(G, grid_start))
-        goal_ne_g = int(closest_point(G, grid_goal))
+        start_ne_g = closest_point(G, grid_start)
+        goal_ne_g = closest_point(G, grid_goal)
         print("start_ne_g: ", start_ne_g)
         print("goal_ne_g: ", goal_ne_g)
 
