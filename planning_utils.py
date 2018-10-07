@@ -52,13 +52,13 @@ class Action(Enum):
     is the cost of performing the action.
     """
     NORTH = (-1, 0, 1)
-    #NORTHWEST = (-1, -1, math.sqrt(2))
+    NORTHWEST = (-1, -1, math.sqrt(2))
     WEST = (0, -1, 1)
-    #SOUTHWEST = (1, -1, math.sqrt(2))
+    SOUTHWEST = (1, -1, math.sqrt(2))
     SOUTH = (1, 0, 1)
-    #SOUTHEAST = (1, 1, math.sqrt(2))
+    SOUTHEAST = (1, 1, math.sqrt(2))
     EAST = (0, 1, 1)
-    #NORTHEAST = (-1, 1, math.sqrt(2))
+    NORTHEAST = (-1, 1, math.sqrt(2))
 
 
 
@@ -84,20 +84,20 @@ def valid_actions(grid, current_node):
 
     if x - 1 < 0 or grid[x - 1, y] == 1:
         valid_actions.remove(Action.NORTH)
-    #    valid_actions.remove(Action.NORTHWEST)
-    #    valid_actions.remove(Action.NORTHEAST)
+        valid_actions.remove(Action.NORTHWEST)
+        valid_actions.remove(Action.NORTHEAST)
     if x + 1 > n or grid[x + 1, y] == 1:
         valid_actions.remove(Action.SOUTH)
-    #    valid_actions.remove(Action.SOUTHWEST)
-    #    valid_actions.remove(Action.SOUTHEAST)
+        valid_actions.remove(Action.SOUTHWEST)
+        valid_actions.remove(Action.SOUTHEAST)
     if y - 1 < 0 or grid[x, y - 1] == 1:
         valid_actions.remove(Action.WEST)
-    #    valid_actions.remove(Action.NORTHWEST)
-    #    valid_actions.remove(Action.SOUTHWEST)
+        valid_actions.remove(Action.NORTHWEST)
+        valid_actions.remove(Action.SOUTHWEST)
     if y + 1 > m or grid[x, y + 1] == 1:
         valid_actions.remove(Action.EAST)
-    #    valid_actions.remove(Action.NORTHEAST)
-    #    valid_actions.remove(Action.SOUTHEAST)
+        valid_actions.remove(Action.NORTHEAST)
+        valid_actions.remove(Action.SOUTHEAST)
 
     return valid_actions
 
