@@ -176,7 +176,7 @@ def closest_point(graph, current_point):
     for p in graph.nodes:
         d = LA.norm(np.array(p) - np.array(current_point))
         if d < dist:
-            closest_point = (int(p[0]) , int(p[1]))
+            closest_point = p
             dist = d
     return closest_point
 
