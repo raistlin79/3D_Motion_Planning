@@ -169,6 +169,7 @@ def prune_path(path):
                 print("Removed: ", path[p+1])
             else:
                 p =+ 1
+                print("Go on with: ", p)
         return path
 
 # Implementation from course
