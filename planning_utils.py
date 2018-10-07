@@ -162,6 +162,7 @@ def prune_path(path):
     if len(path) < 2:
         return path
     else:
+        p = 2
         while p < len(path) - 2:
             if collinearity(path[p], path[p+1], path[p+2]):
                 path.remove(path[p+1])
