@@ -1,6 +1,7 @@
 import argparse
 import time
 import msgpack
+import math
 from enum import Enum, auto
 
 import numpy as np
@@ -145,7 +146,7 @@ class MotionPlanning(Drone):
         # Define starting point on the grid (this is just grid center)
         # grid_start = (-north_offset, -east_offset)
         # TODO: convert start position to current position rather than map center
-        grid_start = (-north_offset + self.local_position[0] , -east_offset + self.local_position[1])
+        grid_start = (-north_offset + int(self.local_position[0]) , -east_offset + int(self.local_position[1]))
 
         # Set goal as some arbitrary position on the grid
         # grid_goal = (-north_offset + 10, -east_offset + 10)
@@ -160,7 +161,7 @@ class MotionPlanning(Drone):
         global_goal = (goal_lon, goal_lat, 0)
         local_goal = global_to_local(global_goal, self.global_home)
         # add north_offset, east_offset
-        grid_goal = (-north_offset + local_goal[0] , -east_offset + local_goal[1] )
+        grid_goal = (-north_offset + int(local_goal[0]) , -east_offset + int(local_goal[1]))
         print('Grid Goal: ', grid_goal)
 
         # Run A* to find a path from start to goal
