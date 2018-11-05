@@ -77,7 +77,7 @@ Now you have a start and goal coordinate on the grid/graph and can find a way be
         waypoints = [[int(p[0]) + north_offset, int(p[1]) + east_offset, TARGET_ALTITUDE, 0] for p in pruned_path]
  ```
 
-## Implementing Your Path Planning Algorithm
+## Implementation of Path Planning Algorithm
 
 Below the code for the more interesting graph solution is given. Markup is provided inline.
 ```
@@ -274,6 +274,6 @@ def collinearity(p1, p2, p3):
 
 ## Executing the flight
 
-I tried a few spots. Here is picture of a calculated voronoi graph based path:
+I tried a few spots. Here is picture of a calculated Voronoi graph based path:
 
 ![Voroni Graph.](Graph.png)
